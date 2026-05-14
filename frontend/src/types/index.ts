@@ -9,6 +9,7 @@ export interface Movie {
   cast: string[]
   posterGradient: string
   has_poster?: boolean
+  poster_url?: string
   watchlist_entries_count?: number
 }
 
