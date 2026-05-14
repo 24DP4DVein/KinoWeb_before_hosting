@@ -107,7 +107,7 @@
                 prepend-icon="mdi-image"
                 density="compact"
                 clearable
-                :hint="movie?.poster_url ? 'Current poster will be replaced' : ''"
+                :hint="movie?.has_poster ? 'Current poster will be replaced' : ''"
                 persistent-hint
               />
               <v-img
@@ -118,8 +118,8 @@
                 cover
               />
               <v-img
-                v-else-if="movie?.poster_url && !posterFile"
-                :src="`${backendUrl}${movie.poster_url}`"
+                v-else-if="movie?.has_poster && !posterFile?.length"
+                :src="`${apiUrl}/movies/${movie.id}/poster`"
                 height="120"
                 class="mt-2 rounded"
                 cover
@@ -150,7 +150,7 @@ import { ref, watch, computed } from 'vue'
 import type { Movie } from '@/types'
 import api from '@/services/api'
 
-const backendUrl = (import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api').replace('/api', '')
+const apiUrl = import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api'
 
 const props = defineProps<{
   modelValue: boolean

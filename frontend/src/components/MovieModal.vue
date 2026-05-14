@@ -5,11 +5,11 @@
         <!-- Poster -->
         <div
           class="movie-poster flex-shrink-0"
-          :style="movie.poster_url ? {} : { background: movie.posterGradient }"
+          :style="movie.has_poster ? {} : { background: movie.posterGradient }"
         >
           <v-img
-            v-if="movie.poster_url"
-            :src="`${backendUrl}${movie.poster_url}`"
+            v-if="movie.has_poster"
+            :src="`${apiUrl}/movies/${movie.id}/poster`"
             cover
             height="100%"
             width="220"
@@ -139,7 +139,7 @@ import { useWatchlistStore } from '@/stores/watchlist'
 import { useRatingsStore } from '@/stores/ratings'
 import { useNotesStore } from '@/stores/notes'
 
-const backendUrl = (import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api').replace('/api', '')
+const apiUrl = import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api'
 
 const props = defineProps<{ modelValue: boolean; movie: Movie | null }>()
 const emit  = defineEmits<{ 'update:modelValue': [v: boolean] }>()

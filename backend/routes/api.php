@@ -20,8 +20,9 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::get('/movies',        [MovieController::class, 'index']);
-Route::get('/movies/{movie}',[MovieController::class, 'show']);
+Route::get('/movies',               [MovieController::class, 'index']);
+Route::get('/movies/{movie}',       [MovieController::class, 'show']);
+Route::get('/movies/{movie}/poster',[MovieController::class, 'poster']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/watchlist',              [WatchlistController::class, 'index']);

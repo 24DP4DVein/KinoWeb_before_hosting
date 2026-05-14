@@ -16,4 +16,15 @@ class MovieController extends Controller
     {
         return response()->json($movie);
     }
+
+    public function poster(Movie $movie)
+    {
+        if (!$movie->poster_mime || !$movie->poster_data) {
+            abort(404);
+        }
+
+        return response($movie->poster_data, 200)
+            ->header('Content-Type', $movie->poster_mime)
+            ->header('Cache-Control', 'public, max-age=31536000');
+    }
 }

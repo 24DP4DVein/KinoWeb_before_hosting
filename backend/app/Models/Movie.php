@@ -7,17 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 class Movie extends Model
 {
     protected $fillable = [
-        'title', 'year', 'rating', 'genres', 'duration', 'description', 'cast', 'posterGradient', 'poster_url',
+        'title', 'year', 'rating', 'genres', 'duration', 'description', 'cast', 'posterGradient', 'poster_mime',
     ];
+
+    protected $hidden = ['poster_data'];
+
+    protected $appends = ['has_poster'];
 
     protected function casts(): array
     {
         return [
-            'genres' => 'array',
-            'cast'   => 'array',
-            'rating' => 'float',
-            'year'   => 'integer',
+            'genres'     => 'array',
+            'cast'       => 'array',
+            'rating'     => 'float',
+            'year'       => 'integer',
+            'has_poster' => 'boolean',
         ];
+    }
+
+    public function getHasPosterAttribute(): bool
+    {
+        return !is_null($this->poster_mime);
     }
 
     public function watchlistEntries()

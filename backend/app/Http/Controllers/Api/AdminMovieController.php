@@ -27,9 +27,18 @@ class AdminMovieController extends Controller
             'cast'           => 'required|array|min:1',
             'cast.*'         => 'string',
             'posterGradient' => 'required|string',
+            'poster'         => 'nullable|image|max:3072',
         ]);
 
         $movie = Movie::create($data);
+
+        if ($request->hasFile('poster')) {
+            $file = $request->file('poster');
+            $movie->poster_data = file_get_contents($file->getRealPath());
+            $movie->poster_mime = $file->getMimeType();
+            $movie->save();
+        }
+
         return response()->json($movie, 201);
     }
 
@@ -46,41 +55,41 @@ class AdminMovieController extends Controller
             'cast'           => 'required|array|min:1',
             'cast.*'         => 'string',
             'posterGradient' => 'required|string',
+            'poster'         => 'nullable|image|max:3072',
         ]);
 
         $movie->update($data);
+
+        if ($request->hasFile('poster')) {
+            $file = $request->file('poster');
+            $movie->poster_data = file_get_contents($file->getRealPath());
+            $movie->poster_mime = $file->getMimeType();
+            $movie->save();
+        }
+
         return response()->json($movie);
     }
 
     public function destroy(Movie $movie)
     {
-        if ($movie->poster_url) {
-            $this->deletePosterFile($movie->poster_url);
-        }
         $movie->delete();
         return response()->json(['ok' => true]);
     }
 
     public function uploadPoster(Request $request, Movie $movie)
     {
-        $request->validate(['poster' => 'required|image|max:5120']);
+        $request->validate(['poster' => 'nullable|image|max:3072']);
 
-        if ($movie->poster_url) {
-            $this->deletePosterFile($movie->poster_url);
+        if (!$request->hasFile('poster')) {
+            return response()->json(['has_poster' => $movie->has_poster]);
         }
 
-        $uploadDir = public_path('uploads/posters');
-        if (! is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
+        $file = $request->file('poster');
+        $movie->poster_data = file_get_contents($file->getRealPath());
+        $movie->poster_mime = $file->getMimeType();
+        $movie->save();
 
-        $file     = $request->file('poster');
-        $filename = uniqid('poster_') . '.' . $file->getClientOriginalExtension();
-        $file->move($uploadDir, $filename);
-
-        $movie->update(['poster_url' => '/uploads/posters/' . $filename]);
-
-        return response()->json(['poster_url' => $movie->poster_url]);
+        return response()->json(['has_poster' => true]);
     }
 
     public function stats()
@@ -102,11 +111,4 @@ class AdminMovieController extends Controller
         return response()->json($movies);
     }
 
-    private function deletePosterFile(string $posterUrl): void
-    {
-        $path = public_path(ltrim($posterUrl, '/'));
-        if (file_exists($path)) {
-            unlink($path);
-        }
-    }
 }

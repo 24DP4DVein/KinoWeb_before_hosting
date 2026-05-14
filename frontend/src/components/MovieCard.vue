@@ -1,9 +1,9 @@
 <template>
   <v-card class="h-100" style="cursor: pointer" @click="$emit('click', movie)">
-    <div class="movie-poster" :style="movie.poster_url ? {} : { background: movie.posterGradient }">
+    <div class="movie-poster" :style="movie.has_poster ? {} : { background: movie.posterGradient }">
       <v-img
-        v-if="movie.poster_url"
-        :src="`${backendUrl}${movie.poster_url}`"
+        v-if="movie.has_poster"
+        :src="`${apiUrl}/movies/${movie.id}/poster`"
         cover
         height="200"
       />
@@ -52,7 +52,7 @@ import { useRatingsStore } from '@/stores/ratings'
 const props = defineProps<{ movie: Movie }>()
 defineEmits<{ click: [movie: Movie] }>()
 
-const backendUrl = (import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api').replace('/api', '')
+const apiUrl = import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api'
 
 const authStore      = useAuthStore()
 const watchlistStore = useWatchlistStore()
