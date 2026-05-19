@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Genre;
 use App\Models\Movie;
 use Illuminate\Http\Request;
 
@@ -30,7 +31,14 @@ class AdminMovieController extends Controller
             'poster'         => 'nullable|image|max:3072',
         ]);
 
+        $genreNames = $data['genres'];
+        unset($data['genres']);
+
         $movie = Movie::create($data);
+
+        $genreIds = collect($genreNames)
+            ->map(fn ($name) => Genre::firstOrCreate(['name' => $name])->id);
+        $movie->genres()->sync($genreIds);
 
         if ($request->hasFile('poster')) {
             $file = $request->file('poster');
@@ -39,7 +47,7 @@ class AdminMovieController extends Controller
             $movie->save();
         }
 
-        return response()->json($movie, 201);
+        return response()->json($movie->fresh(), 201);
     }
 
     public function update(Request $request, Movie $movie)
@@ -58,7 +66,14 @@ class AdminMovieController extends Controller
             'poster'         => 'nullable|image|max:3072',
         ]);
 
+        $genreNames = $data['genres'];
+        unset($data['genres']);
+
         $movie->update($data);
+
+        $genreIds = collect($genreNames)
+            ->map(fn ($name) => Genre::firstOrCreate(['name' => $name])->id);
+        $movie->genres()->sync($genreIds);
 
         if ($request->hasFile('poster')) {
             $file = $request->file('poster');
@@ -67,7 +82,7 @@ class AdminMovieController extends Controller
             $movie->save();
         }
 
-        return response()->json($movie);
+        return response()->json($movie->fresh());
     }
 
     public function destroy(Movie $movie)
@@ -110,5 +125,4 @@ class AdminMovieController extends Controller
 
         return response()->json($movies);
     }
-
 }
