@@ -29,8 +29,22 @@
       <v-btn v-if="authStore.isAdmin" variant="tonal" color="warning" size="small" to="/admin">Admin</v-btn>
     </div>
 
+    <v-btn
+      :icon="isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
+      size="small"
+      variant="text"
+      class="mr-1"
+      @click="toggleTheme"
+    />
+
     <template v-if="authStore.isLoggedIn">
-      <v-chip class="mr-1" color="primary" size="small">
+      <v-chip
+        class="mr-1"
+        color="primary"
+        size="small"
+        style="cursor: pointer"
+        @click="accountDialog = true"
+      >
         {{ authStore.user?.name }}
       </v-chip>
       <v-btn icon="mdi-logout" size="small" class="mr-2" @click="logout" />
@@ -62,23 +76,47 @@
       <v-list-item prepend-icon="mdi-bookmark" to="/watchlist" @click="drawer = false">Watchlist</v-list-item>
       <v-list-item v-if="authStore.isAdmin" prepend-icon="mdi-shield-crown" to="/admin" @click="drawer = false">Admin Panel</v-list-item>
       <v-divider class="my-1" />
+      <v-list-item
+        v-if="authStore.isLoggedIn"
+        prepend-icon="mdi-account-circle"
+        @click="drawer = false; accountDialog = true"
+      >
+        My Account
+      </v-list-item>
+      <v-list-item prepend-icon="mdi-theme-light-dark" @click="toggleTheme">
+        {{ isDark ? 'Light Theme' : 'Dark Theme' }}
+      </v-list-item>
       <v-list-item v-if="authStore.isLoggedIn" prepend-icon="mdi-logout" @click="logout">
-        Sign Out ({{ authStore.user?.name }})
+        Sign Out
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
+
+  <AccountDialog v-model="accountDialog" />
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useTheme } from 'vuetify'
 import { useAuthStore } from '@/stores/auth'
 import { useMoviesStore } from '@/stores/movies'
+import AccountDialog from '@/components/AccountDialog.vue'
 
 defineEmits<{ 'open-auth': [] }>()
 
-const drawer      = ref(false)
-const authStore   = useAuthStore()
-const moviesStore = useMoviesStore()
+const drawer        = ref(false)
+const accountDialog = ref(false)
+const authStore     = useAuthStore()
+const moviesStore   = useMoviesStore()
+const theme         = useTheme()
+
+const isDark = computed(() => theme.global.name.value === 'dark')
+
+function toggleTheme() {
+  const next = isDark.value ? 'light' : 'dark'
+  theme.global.name.value = next
+  localStorage.setItem('theme', next)
+}
 
 async function logout() {
   await authStore.logout()

@@ -102,8 +102,8 @@
                 >Cancel</v-btn>
                 <v-btn
                   size="small"
-                  color="secondary"
-                  variant="tonal"
+                  color="primary"
+                  variant="flat"
                   :disabled="noteText === notesStore.get(movie.id)"
                   :loading="savingNote"
                   @click="saveNote"
