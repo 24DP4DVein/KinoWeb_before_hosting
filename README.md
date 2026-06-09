@@ -1,8 +1,8 @@
 # KinoWeb
 
-KinoWeb is a small full-stack movie app. It has a Vue frontend for browsing movies and a Laravel API for auth, personal lists, ratings, notes, and admin tools.
+KinoWeb ir neliela full-stack filmu aplikācija. Frontend daļa ir veidota filmu pārlūkošanai, bet Laravel API nodrošina autorizāciju, personīgos sarakstus, vērtējumus, piezīmes un administratora funkcijas.
 
-## Stack
+## Tehnoloģijas
 
 Frontend:
 - Vue 3
@@ -16,18 +16,18 @@ Backend:
 - Laravel Sanctum
 - MySQL
 
-## Features
+## Iespējas
 
-- Movie catalog with search, genre filters, and sorting
-- User registration and login through Laravel Sanctum
-- Personal watchlist
-- 1-10 movie ratings
-- Private notes for each movie
-- Admin panel for creating, editing, and deleting movies
-- Poster uploads stored in MySQL
-- Basic admin statistics
+- Filmu katalogs ar meklēšanu, žanru filtriem un kārtošanu
+- Lietotāju reģistrācija un pieslēgšanās ar Laravel Sanctum
+- Personīgais skatāmo filmu saraksts
+- Filmu vērtēšana no 1 līdz 10
+- Privātas piezīmes katrai filmai
+- Administratora panelis filmu izveidei, rediģēšanai un dzēšanai
+- Filmu plakātu augšupielāde un glabāšana MySQL datubāzē
+- Vienkārša administratora statistika
 
-## Project Structure
+## Projekta struktūra
 
 ```text
 backend/
@@ -46,7 +46,7 @@ frontend/
   vite.config.ts
 ```
 
-## Backend Setup
+## Backend palaišana
 
 ```bash
 cd backend
@@ -57,20 +57,20 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-The API runs on:
+API adrese:
 
 ```text
 http://localhost:8000/api
 ```
 
-Default admin user:
+Noklusētais administratora lietotājs:
 
 ```text
 email: admin@admin.com
 password: admin123
 ```
 
-## Frontend Setup
+## Frontend palaišana
 
 ```bash
 cd frontend
@@ -79,19 +79,19 @@ cp .env.example .env
 npm run dev
 ```
 
-For local development, `frontend/.env` should contain:
+Lokālās izstrādes videi failā `frontend/.env` jānorāda:
 
 ```env
 VITE_API_URL=http://localhost:8000/api
 ```
 
-The frontend runs on:
+Frontend adrese:
 
 ```text
 http://localhost:3000
 ```
 
-## Useful Commands
+## Noderīgas komandas
 
 Backend:
 
@@ -108,12 +108,12 @@ npm run dev
 npm run build
 ```
 
-## Deployment Notes
+## Deploy piezīmes
 
-The frontend is configured for Vercel with:
+Frontend daļa ir sagatavota Vercel videi ar:
 
 ```env
 VITE_API_URL=https://kinoweb-hosting.onrender.com/api
 ```
 
-The backend Dockerfile is prepared for Render. On startup it runs migrations, seeds the admin user, and starts Laravel on port `10000`.
+Backend Dockerfile ir sagatavots Render videi. Starta brīdī tas izpilda migrācijas, izveido administratora lietotāju un palaiž Laravel serveri uz porta `10000`.
