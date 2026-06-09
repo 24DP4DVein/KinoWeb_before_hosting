@@ -23,7 +23,7 @@ class RatingController extends Controller
 
         Rating::updateOrCreate(
             ['user_id' => $request->user()->id, 'movie_id' => $movie->id],
-            ['rating'  => $request->rating]
+            ['rating' => $request->rating]
         );
 
         return response()->json(['ok' => true]);

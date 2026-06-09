@@ -18,17 +18,17 @@ class AdminMovieController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'          => 'required|string|max:255',
-            'year'           => 'required|integer|min:1888|max:2100',
-            'rating'         => 'required|numeric|min:0|max:10',
-            'genres'         => 'required|array|min:1',
-            'genres.*'       => 'string',
-            'duration'       => 'required|string|max:20',
-            'description'    => 'required|string',
-            'cast'           => 'required|array|min:1',
-            'cast.*'         => 'string',
+            'title' => 'required|string|max:255',
+            'year' => 'required|integer|min:1888|max:2100',
+            'rating' => 'required|numeric|min:0|max:10',
+            'genres' => 'required|array|min:1',
+            'genres.*' => 'string',
+            'duration' => 'required|string|max:20',
+            'description' => 'required|string',
+            'cast' => 'required|array|min:1',
+            'cast.*' => 'string',
             'posterGradient' => 'required|string',
-            'poster'         => 'nullable|image|max:3072',
+            'poster' => 'nullable|image|max:3072',
         ]);
 
         $genreNames = $data['genres'];
@@ -53,17 +53,17 @@ class AdminMovieController extends Controller
     public function update(Request $request, Movie $movie)
     {
         $data = $request->validate([
-            'title'          => 'required|string|max:255',
-            'year'           => 'required|integer|min:1888|max:2100',
-            'rating'         => 'required|numeric|min:0|max:10',
-            'genres'         => 'required|array|min:1',
-            'genres.*'       => 'string',
-            'duration'       => 'required|string|max:20',
-            'description'    => 'required|string',
-            'cast'           => 'required|array|min:1',
-            'cast.*'         => 'string',
+            'title' => 'required|string|max:255',
+            'year' => 'required|integer|min:1888|max:2100',
+            'rating' => 'required|numeric|min:0|max:10',
+            'genres' => 'required|array|min:1',
+            'genres.*' => 'string',
+            'duration' => 'required|string|max:20',
+            'description' => 'required|string',
+            'cast' => 'required|array|min:1',
+            'cast.*' => 'string',
             'posterGradient' => 'required|string',
-            'poster'         => 'nullable|image|max:3072',
+            'poster' => 'nullable|image|max:3072',
         ]);
 
         $genreNames = $data['genres'];
@@ -114,12 +114,12 @@ class AdminMovieController extends Controller
             ->orderByDesc('watchlist_entries_count')
             ->get()
             ->map(fn ($m) => [
-                'id'              => $m->id,
-                'title'           => $m->title,
-                'year'            => $m->year,
-                'rating'          => $m->rating,
+                'id' => $m->id,
+                'title' => $m->title,
+                'year' => $m->year,
+                'rating' => $m->rating,
                 'watchlist_count' => $m->watchlist_entries_count,
-                'ratings_count'   => $m->ratings_count,
+                'ratings_count' => $m->ratings_count,
                 'avg_user_rating' => $m->ratings_avg_rating ? round($m->ratings_avg_rating, 1) : null,
             ]);
 

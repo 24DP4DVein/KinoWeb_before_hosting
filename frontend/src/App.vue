@@ -18,12 +18,12 @@ import { useWatchlistStore } from '@/stores/watchlist'
 import { useRatingsStore } from '@/stores/ratings'
 import { useNotesStore } from '@/stores/notes'
 
-const authDialog     = ref(false)
-const authStore      = useAuthStore()
-const moviesStore    = useMoviesStore()
+const authDialog = ref(false)
+const authStore = useAuthStore()
+const moviesStore = useMoviesStore()
 const watchlistStore = useWatchlistStore()
-const ratingsStore   = useRatingsStore()
-const notesStore     = useNotesStore()
+const ratingsStore = useRatingsStore()
+const notesStore = useNotesStore()
 
 onMounted(async () => {
   authStore.init()

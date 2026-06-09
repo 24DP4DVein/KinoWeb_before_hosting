@@ -19,7 +19,7 @@ class WatchlistController extends Controller
     public function store(Request $request, Movie $movie)
     {
         Watchlist::firstOrCreate([
-            'user_id'  => $request->user()->id,
+            'user_id' => $request->user()->id,
             'movie_id' => $movie->id,
         ]);
 

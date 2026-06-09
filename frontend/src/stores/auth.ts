@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function _clearSession() {
     token.value = null
-    user.value  = null
+    user.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
   }

@@ -19,7 +19,7 @@
         <!-- Details -->
         <div class="flex-grow-1 overflow-auto">
           <v-card-title class="text-h5 pt-4 px-4 pb-1">{{ movie.title }}</v-card-title>
-          <v-card-subtitle class="px-4 pb-2">{{ movie.year }} · {{ movie.duration }}</v-card-subtitle>
+          <v-card-subtitle class="px-4 pb-2">{{ movie.year }} / {{ movie.duration }}</v-card-subtitle>
 
           <v-card-text>
             <!-- Ratings row -->

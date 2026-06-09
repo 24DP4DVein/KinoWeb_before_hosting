@@ -31,7 +31,7 @@ import { ref, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{ modelValue: boolean }>()
-const emit  = defineEmits<{ 'update:modelValue': [v: boolean] }>()
+const emit = defineEmits<{ 'update:modelValue': [v: boolean] }>()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -39,23 +39,23 @@ const isOpen = computed({
 })
 
 const authStore = useAuthStore()
-const tab       = ref('login')
-const name      = ref('')
-const email     = ref('')
-const password  = ref('')
-const loading   = ref(false)
-const error     = ref('')
+const tab = ref('login')
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+const error = ref('')
 
 watch(isOpen, (open) => {
   if (!open) return
-  error.value    = ''
-  name.value     = ''
-  email.value    = ''
+  error.value = ''
+  name.value = ''
+  email.value = ''
   password.value = ''
 })
 
 async function doLogin() {
-  error.value   = ''
+  error.value = ''
   loading.value = true
   try {
     await authStore.login(email.value, password.value)
@@ -68,7 +68,7 @@ async function doLogin() {
 }
 
 async function doRegister() {
-  error.value   = ''
+  error.value = ''
   loading.value = true
   try {
     await authStore.register(name.value, email.value, password.value)

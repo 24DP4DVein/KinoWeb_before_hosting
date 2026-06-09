@@ -15,7 +15,6 @@
     </v-tabs>
 
     <v-window v-model="tab">
-      <!-- Movies tab -->
       <v-window-item value="movies">
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
 
@@ -29,13 +28,11 @@
           <template #item.poster="{ item }">
             <div
               class="poster-thumb rounded"
-              :style="item.poster_url
-                ? {}
-                : { background: item.posterGradient }"
+              :style="item.has_poster ? {} : { background: item.posterGradient }"
             >
               <v-img
-                v-if="item.poster_url"
-                :src="`http://localhost:8000${item.poster_url}`"
+                v-if="item.has_poster"
+                :src="posterUrl(item.id)"
                 cover
                 height="48"
                 width="36"
@@ -64,8 +61,9 @@
         </v-data-table>
       </v-window-item>
 
-      <!-- Stats tab -->
       <v-window-item value="stats">
+        <v-alert v-if="statsError" type="error" class="mb-4">{{ statsError }}</v-alert>
+
         <v-data-table
           :headers="statsHeaders"
           :items="stats"
@@ -76,15 +74,17 @@
           <template #item.watchlist_count="{ item }">
             <v-chip size="small" color="primary" variant="tonal">{{ item.watchlist_count }}</v-chip>
           </template>
+
           <template #item.ratings_count="{ item }">
             <v-chip size="small" color="secondary" variant="tonal">{{ item.ratings_count }}</v-chip>
           </template>
+
           <template #item.avg_user_rating="{ item }">
             <span v-if="item.avg_user_rating">
               <v-icon size="14" color="primary">mdi-star</v-icon>
               {{ item.avg_user_rating }}
             </span>
-            <span v-else class="text-medium-emphasis">—</span>
+            <span v-else class="text-medium-emphasis">-</span>
           </template>
         </v-data-table>
       </v-window-item>
@@ -116,49 +116,50 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { Movie } from '@/types'
-import api from '@/services/api'
+import api, { posterUrl } from '@/services/api'
 import AdminMovieDialog from '@/components/AdminMovieDialog.vue'
 import { useMoviesStore } from '@/stores/movies'
 
 const moviesStore = useMoviesStore()
 
-const tab     = ref('movies')
+const tab = ref('movies')
 const loading = ref(false)
-const error   = ref<string | null>(null)
-const movies  = ref<Movie[]>([])
+const error = ref<string | null>(null)
+const movies = ref<Movie[]>([])
 
 const statsLoading = ref(false)
-const stats        = ref<any[]>([])
+const statsError = ref<string | null>(null)
+const stats = ref<any[]>([])
 
-const dialogOpen   = ref(false)
+const dialogOpen = ref(false)
 const editingMovie = ref<Movie | null>(null)
 
-const deleteDialog  = ref(false)
+const deleteDialog = ref(false)
 const deletingMovie = ref<Movie | null>(null)
-const deleting      = ref(false)
+const deleting = ref(false)
 
 const movieHeaders = [
-  { title: '',          key: 'poster',                  sortable: false, width: 52 },
-  { title: 'Title',     key: 'title' },
-  { title: 'Year',      key: 'year',  width: 80 },
-  { title: 'Rating',    key: 'rating', width: 90 },
-  { title: 'Genres',    key: 'genres',  sortable: false },
+  { title: '', key: 'poster', sortable: false, width: 52 },
+  { title: 'Title', key: 'title' },
+  { title: 'Year', key: 'year', width: 80 },
+  { title: 'Rating', key: 'rating', width: 90 },
+  { title: 'Genres', key: 'genres', sortable: false },
   { title: 'Watchlist', key: 'watchlist_entries_count', width: 110 },
-  { title: '',          key: 'actions', sortable: false, width: 90 },
+  { title: '', key: 'actions', sortable: false, width: 90 },
 ]
 
 const statsHeaders = [
-  { title: 'Title',          key: 'title' },
-  { title: 'Year',           key: 'year',           width: 80 },
-  { title: 'IMDb',           key: 'rating',         width: 80 },
-  { title: 'In Watchlists',  key: 'watchlist_count', width: 130 },
-  { title: 'Rated by users', key: 'ratings_count',  width: 140 },
+  { title: 'Title', key: 'title' },
+  { title: 'Year', key: 'year', width: 80 },
+  { title: 'IMDb', key: 'rating', width: 80 },
+  { title: 'In Watchlists', key: 'watchlist_count', width: 130 },
+  { title: 'Rated by users', key: 'ratings_count', width: 140 },
   { title: 'Avg User Rating', key: 'avg_user_rating', width: 150 },
 ]
 
 async function loadMovies() {
   loading.value = true
-  error.value   = null
+  error.value = null
   try {
     const { data } = await api.get('/admin/movies')
     movies.value = data
@@ -172,9 +173,12 @@ async function loadMovies() {
 async function loadStats() {
   if (stats.value.length) return
   statsLoading.value = true
+  statsError.value = null
   try {
     const { data } = await api.get('/admin/stats')
     stats.value = data
+  } catch {
+    statsError.value = 'Failed to load statistics'
   } finally {
     statsLoading.value = false
   }
@@ -182,28 +186,32 @@ async function loadStats() {
 
 function openCreate() {
   editingMovie.value = null
-  dialogOpen.value   = true
+  dialogOpen.value = true
 }
 
 function openEdit(movie: Movie) {
   editingMovie.value = movie
-  dialogOpen.value   = true
+  dialogOpen.value = true
 }
 
 function confirmDelete(movie: Movie) {
   deletingMovie.value = movie
-  deleteDialog.value  = true
+  deleteDialog.value = true
 }
 
 async function deleteMovie() {
   if (!deletingMovie.value) return
   deleting.value = true
+  error.value = null
+
   try {
     await api.delete(`/admin/movies/${deletingMovie.value.id}`)
-    movies.value       = movies.value.filter((m) => m.id !== deletingMovie.value!.id)
-    stats.value        = []
+    movies.value = movies.value.filter((m) => m.id !== deletingMovie.value!.id)
+    stats.value = []
     deleteDialog.value = false
     await moviesStore.fetchMovies()
+  } catch {
+    error.value = 'Failed to delete movie'
   } finally {
     deleting.value = false
   }

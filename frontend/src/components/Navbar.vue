@@ -4,7 +4,7 @@
 
     <v-app-bar-title class="flex-shrink-0" style="min-width: fit-content">
       <router-link to="/" class="text-decoration-none text-primary font-weight-bold text-h6">
-        🎬 KinoWEB
+        KinoWEB
       </router-link>
     </v-app-bar-title>
 
@@ -49,6 +49,7 @@
       </v-chip>
       <v-btn icon="mdi-logout" size="small" class="mr-2" @click="logout" />
     </template>
+
     <template v-else>
       <v-btn color="primary" variant="tonal" size="small" class="mr-2" @click="$emit('open-auth')">
         Sign In
@@ -79,7 +80,7 @@
       <v-list-item
         v-if="authStore.isLoggedIn"
         prepend-icon="mdi-account-circle"
-        @click="drawer = false; accountDialog = true"
+        @click="openAccount"
       >
         My Account
       </v-list-item>
@@ -104,11 +105,11 @@ import AccountDialog from '@/components/AccountDialog.vue'
 
 defineEmits<{ 'open-auth': [] }>()
 
-const drawer        = ref(false)
+const drawer = ref(false)
 const accountDialog = ref(false)
-const authStore     = useAuthStore()
-const moviesStore   = useMoviesStore()
-const theme         = useTheme()
+const authStore = useAuthStore()
+const moviesStore = useMoviesStore()
+const theme = useTheme()
 
 const isDark = computed(() => theme.global.name.value === 'dark')
 
@@ -116,6 +117,11 @@ function toggleTheme() {
   const next = isDark.value ? 'light' : 'dark'
   theme.global.name.value = next
   localStorage.setItem('theme', next)
+}
+
+function openAccount() {
+  drawer.value = false
+  accountDialog.value = true
 }
 
 async function logout() {

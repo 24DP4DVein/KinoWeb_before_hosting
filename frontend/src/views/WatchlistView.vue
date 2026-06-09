@@ -30,10 +30,10 @@ import { useWatchlistStore } from '@/stores/watchlist'
 import MovieCard from '@/components/MovieCard.vue'
 import MovieModal from '@/components/MovieModal.vue'
 
-const moviesStore    = useMoviesStore()
+const moviesStore = useMoviesStore()
 const watchlistStore = useWatchlistStore()
-const modalOpen      = ref(false)
-const selectedMovie  = ref<Movie | null>(null)
+const modalOpen = ref(false)
+const selectedMovie = ref<Movie | null>(null)
 
 const watchlistMovies = computed(() =>
   moviesStore.movies.filter((m) => watchlistStore.has(m.id)),
@@ -41,6 +41,6 @@ const watchlistMovies = computed(() =>
 
 function openMovie(movie: Movie) {
   selectedMovie.value = movie
-  modalOpen.value     = true
+  modalOpen.value = true
 }
 </script>

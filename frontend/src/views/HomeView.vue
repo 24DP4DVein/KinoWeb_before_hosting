@@ -3,7 +3,6 @@
     <Hero @open-info="infoOpen = true" @open-movie="openMovieById" />
 
     <v-container>
-      <!-- Filters -->
       <v-row align="center" class="mb-2">
         <v-col cols="12" sm="8">
           <v-chip-group v-model="moviesStore.genre" mandatory selected-class="text-primary">
@@ -16,6 +15,7 @@
             >{{ g }}</v-chip>
           </v-chip-group>
         </v-col>
+
         <v-col cols="12" sm="4">
           <v-select
             v-model="moviesStore.sort"
@@ -33,19 +33,16 @@
         {{ moviesStore.filtered.length }} movies
       </div>
 
-      <!-- Skeleton loader -->
       <v-row v-if="moviesStore.loading">
         <v-col v-for="n in 12" :key="n" cols="6" sm="4" md="3" lg="2">
           <v-skeleton-loader type="card" />
         </v-col>
       </v-row>
 
-      <!-- Error -->
       <v-alert v-else-if="moviesStore.error" type="error" class="mb-4">
         {{ moviesStore.error }}
       </v-alert>
 
-      <!-- Grid -->
       <v-row v-else>
         <v-col
           v-for="movie in moviesStore.filtered"
@@ -54,6 +51,7 @@
         >
           <MovieCard :movie="movie" @click="openMovie" />
         </v-col>
+
         <v-col v-if="!moviesStore.filtered.length" cols="12" class="text-center py-12 text-medium-emphasis">
           No movies found
         </v-col>
@@ -74,22 +72,22 @@ import MovieCard from '@/components/MovieCard.vue'
 import MovieModal from '@/components/MovieModal.vue'
 import InfoModal from '@/components/InfoModal.vue'
 
-const moviesStore  = useMoviesStore()
-const modalOpen    = ref(false)
-const infoOpen     = ref(false)
+const moviesStore = useMoviesStore()
+const modalOpen = ref(false)
+const infoOpen = ref(false)
 const selectedMovie = ref<Movie | null>(null)
 
 const genres = ['All', 'Action', 'Drama', 'Comedy', 'Sci-Fi', 'Thriller', 'Adventure', 'Fantasy', 'Crime']
 
 const sortOptions = [
   { label: 'Rating (High to Low)', value: 'rating_desc' },
-  { label: 'Year (New to Old)',     value: 'year_desc' },
-  { label: 'Title (A–Z)',           value: 'title_asc' },
+  { label: 'Year (New to Old)', value: 'year_desc' },
+  { label: 'Title (A-Z)', value: 'title_asc' },
 ]
 
 function openMovie(movie: Movie) {
   selectedMovie.value = movie
-  modalOpen.value     = true
+  modalOpen.value = true
 }
 
 function openMovieById(id: number) {

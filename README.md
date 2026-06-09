@@ -1,90 +1,119 @@
 # KinoWeb
 
-Full-stack movie discovery app built with Vue 3 and Laravel 11.
+KinoWeb is a small full-stack movie app. It has a Vue frontend for browsing movies and a Laravel API for auth, personal lists, ratings, notes, and admin tools.
 
 ## Stack
 
-**Frontend:** Vue 3, Vuetify 3, Pinia, Vite, TypeScript  
-**Backend:** Laravel 11, Sanctum (REST API)  
-**Database:** MySQL
+Frontend:
+- Vue 3
+- Vuetify 3
+- Pinia
+- Vite
+- TypeScript
+
+Backend:
+- Laravel 11
+- Laravel Sanctum
+- MySQL
 
 ## Features
 
-- Browse movies with search, genre filter, and sorting
-- User registration and token-based auth (Sanctum)
-- Personal watchlist — add/remove movies
-- Rate movies 1–10
-- Write personal notes per movie
-- Admin panel: create/edit/delete movies, upload posters, view statistics
-- Movie posters stored as binary data in MySQL (no external storage)
+- Movie catalog with search, genre filters, and sorting
+- User registration and login through Laravel Sanctum
+- Personal watchlist
+- 1-10 movie ratings
+- Private notes for each movie
+- Admin panel for creating, editing, and deleting movies
+- Poster uploads stored in MySQL
+- Basic admin statistics
 
 ## Project Structure
 
-```
-├── backend/           # Laravel 11 API
-│   ├── app/
-│   ├── database/
-│   ├── routes/api.php
-│   └── .env.example
-└── frontend/          # Vue 3 SPA
-    ├── src/
-    │   ├── components/
-    │   ├── views/
-    │   ├── stores/    # Pinia
-    │   ├── services/api.ts
-    │   └── types/
-    └── .env.example
+```text
+backend/
+  app/
+  config/
+  database/
+  routes/api.php
+  Dockerfile
+
+frontend/
+  src/
+    components/
+    services/api.ts
+    stores/
+    views/
+  vite.config.ts
 ```
 
-## Getting Started
-
-### Backend
+## Backend Setup
 
 ```bash
 cd backend
 composer install
 cp .env.example .env
-# Fill in DB credentials in .env
 php artisan key:generate
 php artisan migrate --seed
 php artisan serve
 ```
 
-Runs at `http://localhost:8000`
+The API runs on:
 
-Default admin account: `admin@admin.com` / `admin123`
+```text
+http://localhost:8000/api
+```
 
-### Frontend
+Default admin user:
+
+```text
+email: admin@admin.com
+password: admin123
+```
+
+## Frontend Setup
 
 ```bash
 cd frontend
 npm install
 cp .env.example .env
-# .env already has: VITE_API_URL=http://localhost:8000/api
 npm run dev
 ```
 
-Runs at `http://localhost:3000`
+For local development, `frontend/.env` should contain:
 
-## API Overview
+```env
+VITE_API_URL=http://localhost:8000/api
+```
 
-Base URL: `/api`
+The frontend runs on:
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/auth/register` | — | Register |
-| POST | `/auth/login` | — | Login |
-| POST | `/auth/logout` | ✓ | Logout |
-| GET | `/movies` | — | List movies |
-| GET | `/movies/{id}/poster` | — | Movie poster image |
-| GET | `/watchlist` | ✓ | User's watchlist |
-| POST/DELETE | `/watchlist/{id}` | ✓ | Add/remove from watchlist |
-| GET | `/ratings` | ✓ | User's ratings |
-| POST | `/ratings/{id}` | ✓ | Rate a movie |
-| GET/POST/DELETE | `/notes/{id}` | ✓ | Personal notes |
-| GET/POST/PUT/DELETE | `/admin/movies` | admin | Manage movies |
-| GET | `/admin/stats` | admin | Statistics |
+```text
+http://localhost:3000
+```
 
-## License
+## Useful Commands
 
-Educational project.
+Backend:
+
+```bash
+php artisan migrate
+php artisan db:seed --class=AdminSeeder
+php artisan serve
+```
+
+Frontend:
+
+```bash
+npm run dev
+npm run build
+```
+
+## Deployment Notes
+
+The frontend is configured for Vercel with:
+
+```env
+VITE_API_URL=https://kinoweb-hosting.onrender.com/api
+```
+
+The backend Dockerfile is prepared for Render. On startup it runs migrations, seeds the admin user, and starts Laravel on port `10000`.

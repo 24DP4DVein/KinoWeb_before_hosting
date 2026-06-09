@@ -12,7 +12,7 @@ class AdminSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@admin.com'],
             [
-                'name'     => 'Admin',
+                'name' => 'Admin',
                 'password' => bcrypt('admin123'),
                 'is_admin' => true,
             ]

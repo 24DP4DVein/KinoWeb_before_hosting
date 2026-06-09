@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1 class="text-h5 font-weight-bold mb-1">Top Rated</h1>
-    <p class="text-medium-emphasis mb-6">Movies with IMDb rating ≥ 8.5</p>
+    <p class="text-medium-emphasis mb-6">Movies with IMDb rating of 8.5 or higher</p>
 
     <v-row>
       <v-col
@@ -24,8 +24,8 @@ import { useMoviesStore } from '@/stores/movies'
 import MovieCard from '@/components/MovieCard.vue'
 import MovieModal from '@/components/MovieModal.vue'
 
-const moviesStore   = useMoviesStore()
-const modalOpen     = ref(false)
+const moviesStore = useMoviesStore()
+const modalOpen = ref(false)
 const selectedMovie = ref<Movie | null>(null)
 
 const topRated = computed(() =>
@@ -36,6 +36,6 @@ const topRated = computed(() =>
 
 function openMovie(movie: Movie) {
   selectedMovie.value = movie
-  modalOpen.value     = true
+  modalOpen.value = true
 }
 </script>

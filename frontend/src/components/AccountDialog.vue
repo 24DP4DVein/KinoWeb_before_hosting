@@ -12,6 +12,7 @@
           <v-avatar size="64" color="primary" class="mr-4 flex-shrink-0">
             <span class="text-h5 font-weight-bold text-on-primary">{{ initials }}</span>
           </v-avatar>
+
           <div class="overflow-hidden">
             <div class="text-h6 font-weight-bold text-truncate">{{ authStore.user?.name }}</div>
             <div class="text-body-2 text-medium-emphasis text-truncate">{{ authStore.user?.email }}</div>
@@ -47,6 +48,10 @@
     <v-card>
       <v-card-title class="pt-4 px-6">Are you sure?</v-card-title>
       <v-card-text class="px-6">
+        <v-alert v-if="error" type="error" variant="tonal" density="compact" class="mb-4">
+          {{ error }}
+        </v-alert>
+
         Your account <strong>{{ authStore.user?.email }}</strong> and all associated data will be permanently deleted.
       </v-card-text>
       <v-card-actions class="px-6 pb-4">
@@ -64,23 +69,24 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{ modelValue: boolean }>()
-const emit  = defineEmits<{ 'update:modelValue': [v: boolean] }>()
+const emit = defineEmits<{ 'update:modelValue': [v: boolean] }>()
 
 const isOpen = computed({
   get: () => props.modelValue,
   set: (v) => emit('update:modelValue', v),
 })
 
-const authStore    = useAuthStore()
-const router       = useRouter()
-const confirmOpen  = ref(false)
-const deleting     = ref(false)
+const authStore = useAuthStore()
+const router = useRouter()
+const confirmOpen = ref(false)
+const deleting = ref(false)
+const error = ref('')
 
 const initials = computed(() => {
   const name = authStore.user?.name ?? ''
   return name
     .split(' ')
-    .map((w) => w[0] ?? '')
+    .map((word) => word[0] ?? '')
     .join('')
     .toUpperCase()
     .slice(0, 2)
@@ -88,13 +94,15 @@ const initials = computed(() => {
 
 async function doDelete() {
   deleting.value = true
+  error.value = ''
+
   try {
     await authStore.deleteAccount()
     confirmOpen.value = false
-    isOpen.value      = false
+    isOpen.value = false
     router.push('/')
   } catch {
-    // keep dialog open on error
+    error.value = 'Failed to delete account. Please try again.'
   } finally {
     deleting.value = false
   }

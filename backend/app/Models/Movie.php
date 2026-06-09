@@ -21,9 +21,9 @@ class Movie extends Model
     protected function casts(): array
     {
         return [
-            'cast'       => 'array',
-            'rating'     => 'float',
-            'year'       => 'integer',
+            'cast' => 'array',
+            'rating' => 'float',
+            'year' => 'integer',
             'has_poster' => 'boolean',
         ];
     }
