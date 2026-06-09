@@ -4,17 +4,17 @@ import api from '@/services/api'
 import type { Movie, SortOption } from '@/types'
 
 export const useMoviesStore = defineStore('movies', () => {
-  const movies  = ref<Movie[]>([])
+  const movies = ref<Movie[]>([])
   const loading = ref(false)
-  const error   = ref<string | null>(null)
+  const error = ref<string | null>(null)
 
   const search = ref('')
-  const genre  = ref('All')
-  const sort   = ref<SortOption>('rating_desc')
+  const genre = ref('All')
+  const sort = ref<SortOption>('rating_desc')
 
   async function fetchMovies() {
     loading.value = true
-    error.value   = null
+    error.value = null
     try {
       const { data } = await api.get('/movies')
       movies.value = data

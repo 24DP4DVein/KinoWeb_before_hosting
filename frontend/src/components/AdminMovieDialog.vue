@@ -6,6 +6,15 @@
       </v-card-title>
 
       <v-card-text class="px-6">
+        <v-alert
+          v-if="error"
+          type="error"
+          variant="tonal"
+          density="compact"
+          class="mb-4"
+          closable
+          @click:close="error = null"
+        >{{ error }}</v-alert>
         <v-form ref="formRef" @submit.prevent="submit">
           <v-row dense>
             <v-col cols="12" sm="8">
@@ -119,7 +128,7 @@
               />
               <v-img
                 v-else-if="movie?.has_poster && !posterFile?.length"
-                :src="`${apiUrl}/movies/${movie.id}/poster`"
+                :src="posterUrl(movie.id)"
                 height="120"
                 class="mt-2 rounded"
                 cover
@@ -148,9 +157,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import type { Movie } from '@/types'
-import api from '@/services/api'
-
-const apiUrl = import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api'
+import api, { posterUrl } from '@/services/api'
 
 const props = defineProps<{
   modelValue: boolean
@@ -166,20 +173,21 @@ const isOpen = computed({
   set: (v) => emit('update:modelValue', v),
 })
 
-const formRef   = ref()
-const saving    = ref(false)
+const formRef = ref()
+const saving = ref(false)
+const error = ref<string | null>(null)
 const posterFile = ref<File[]>([])
 
 const genreOptions = ['Action', 'Drama', 'Comedy', 'Sci-Fi', 'Thriller', 'Adventure', 'Fantasy', 'Crime', 'Horror', 'Romance', 'Animation']
 
 const emptyForm = () => ({
-  title:          '',
-  year:           new Date().getFullYear(),
-  rating:         7.0,
-  genres:         [] as string[],
-  duration:       '',
-  description:    '',
-  cast:           [] as string[],
+  title: '',
+  year: new Date().getFullYear(),
+  rating: 7.0,
+  genres: [] as string[],
+  duration: '',
+  description: '',
+  cast: [] as string[],
   posterGradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
 })
 
@@ -196,13 +204,13 @@ watch(
   (m) => {
     if (m) {
       form.value = {
-        title:          m.title,
-        year:           m.year,
-        rating:         m.rating,
-        genres:         [...m.genres],
-        duration:       m.duration,
-        description:    m.description,
-        cast:           [...m.cast],
+        title: m.title,
+        year: m.year,
+        rating: m.rating,
+        genres: [...m.genres],
+        duration: m.duration,
+        description: m.description,
+        cast: [...m.cast],
         posterGradient: m.posterGradient,
       }
     } else {
@@ -213,7 +221,7 @@ watch(
   { immediate: true },
 )
 
-const required      = (v: string | number) => !!v || 'Required'
+const required = (v: string | number) => !!v || 'Required'
 const requiredArray = (v: string[]) => (v && v.length > 0) || 'At least one required'
 
 async function submit() {
@@ -221,6 +229,7 @@ async function submit() {
   if (!valid) return
 
   saving.value = true
+  error.value = null
   try {
     let saved: Movie
     if (props.movie) {
@@ -242,12 +251,15 @@ async function submit() {
 
     emit('saved')
     close()
+  } catch {
+    error.value = 'Something went wrong. Please try again.'
   } finally {
     saving.value = false
   }
 }
 
 function close() {
+  error.value = null
   isOpen.value = false
 }
 </script>

@@ -3,7 +3,7 @@
     <div class="movie-poster" :style="movie.has_poster ? {} : { background: movie.posterGradient }">
       <v-img
         v-if="movie.has_poster"
-        :src="`${apiUrl}/movies/${movie.id}/poster`"
+        :src="posterUrl(movie.id)"
         cover
         height="200"
       />
@@ -45,6 +45,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Movie } from '@/types'
+import { posterUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import { useWatchlistStore } from '@/stores/watchlist'
 import { useRatingsStore } from '@/stores/ratings'
@@ -52,14 +53,12 @@ import { useRatingsStore } from '@/stores/ratings'
 const props = defineProps<{ movie: Movie }>()
 defineEmits<{ click: [movie: Movie] }>()
 
-const apiUrl = import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api'
-
-const authStore      = useAuthStore()
+const authStore = useAuthStore()
 const watchlistStore = useWatchlistStore()
-const ratingsStore   = useRatingsStore()
+const ratingsStore = useRatingsStore()
 
 const inWatchlist = computed(() => watchlistStore.has(props.movie.id))
-const userRating  = computed(() => ratingsStore.get(props.movie.id))
+const userRating = computed(() => ratingsStore.get(props.movie.id))
 </script>
 
 <style scoped>

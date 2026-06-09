@@ -6,8 +6,12 @@ export const useNotesStore = defineStore('notes', () => {
   const notes = ref<Record<number, string>>({})
 
   async function fetch() {
-    const { data } = await api.get('/notes')
-    notes.value = data
+    try {
+      const { data } = await api.get('/notes')
+      notes.value = data
+    } catch {
+      // keep existing state on failure
+    }
   }
 
   function get(movieId: number): string {

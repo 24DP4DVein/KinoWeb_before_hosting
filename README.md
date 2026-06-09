@@ -1,197 +1,90 @@
-# KinoWEB — Movie Discovery App
+# KinoWeb
 
-A full-stack web application for browsing, rating, and managing a personal watchlist of movies.
+Full-stack movie discovery app built with Vue 3 and Laravel 11.
 
----
+## Stack
 
-## Tech Stack
-
-### Frontend
-- React 19
-- TypeScript 5.8
-- Vite 6
-- Tailwind CSS (via CDN)
-- Lucide React (icons)
-
-### Backend
-- Node.js + Express 4
-- TypeScript 5.8
-- mysql2
-
-### Database
-- MySQL
-
----
+**Frontend:** Vue 3, Vuetify 3, Pinia, Vite, TypeScript  
+**Backend:** Laravel 11, Sanctum (REST API)  
+**Database:** MySQL
 
 ## Features
 
-### Authentication
-- Client-side sign in / register (stored in `localStorage`)
-- Session persistence across browser refreshes
-- Password minimum 6 characters
-
-### Movie Browsing
-- Grid layout with 3 views: **Home**, **Watchlist**, **Top Rated** (rating ≥ 8.5)
-- Hero section with random movie picker
-- Movie detail modal (description, cast, duration, rating)
-
-### Filtering & Sorting
-- Real-time search by title
-- Genre filter: All, Action, Drama, Comedy, Sci-Fi, Thriller, Adventure, Fantasy, Crime
-- Sort by: Rating (High to Low), Year (New to Old), Title (A–Z)
-
-### Watchlist
-- Add/remove movies, persisted in `localStorage` per user
-
-### Ratings
-- 1–10 rating per movie, persisted in `localStorage` per user
-
----
+- Browse movies with search, genre filter, and sorting
+- User registration and token-based auth (Sanctum)
+- Personal watchlist — add/remove movies
+- Rate movies 1–10
+- Write personal notes per movie
+- Admin panel: create/edit/delete movies, upload posters, view statistics
+- Movie posters stored as binary data in MySQL (no external storage)
 
 ## Project Structure
 
 ```
-/
-├── App.tsx                  # Main app component
-├── index.tsx                # React entry point
-├── index.html               # HTML entry (Tailwind CDN, custom scrollbar styles)
-├── types.ts                 # TypeScript interfaces (Movie, User, UserData, SortOption)
-├── constants.ts             # Genre list + 12 demo movies
-├── vite.config.ts
-├── tsconfig.json
-├── components/
-│   ├── AuthOverlay.tsx      # Login / Register overlay
-│   ├── Navbar.tsx           # Top navigation (desktop + mobile)
-│   ├── Hero.tsx             # Hero banner with random movie button
-│   ├── MovieCard.tsx        # Grid card component
-│   ├── MovieModal.tsx       # Full movie detail modal
-│   └── InfoModal.tsx        # About modal
-├── services/
-│   └── storage.ts           # localStorage helpers
-└── backend/
+├── backend/           # Laravel 11 API
+│   ├── app/
+│   ├── database/
+│   ├── routes/api.php
+│   └── .env.example
+└── frontend/          # Vue 3 SPA
     ├── src/
-    │   ├── index.ts         # Express server
-    │   └── db.ts            # MySQL connection pool
-    └── .env                 # Database credentials (not committed)
+    │   ├── components/
+    │   ├── views/
+    │   ├── stores/    # Pinia
+    │   ├── services/api.ts
+    │   └── types/
+    └── .env.example
 ```
 
----
+## Getting Started
 
-## System Requirements
-
-- Node.js v18+
-- MySQL v8+
-- npm
-
----
-
-## Installation
-
-### 1. Install frontend dependencies
-
-```bash
-npm install
-```
-
-### 2. Install backend dependencies
+### Backend
 
 ```bash
 cd backend
+composer install
+cp .env.example .env
+# Fill in DB credentials in .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
+
+Runs at `http://localhost:8000`
+
+Default admin account: `admin@admin.com` / `admin123`
+
+### Frontend
+
+```bash
+cd frontend
 npm install
-```
-
-### 3. Configure environment variables
-
-Create `backend/.env`:
-
-```env
-PORT=3001
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=movieweb
-```
-
-### 4. Set up the database
-
-Create a MySQL database named `movieweb` and a `movies` table with columns:
-
-| Column          | Type          |
-|-----------------|---------------|
-| id              | INT (PK)      |
-| title           | VARCHAR       |
-| year            | INT           |
-| rating          | DECIMAL       |
-| genres          | JSON          |
-| duration        | VARCHAR       |
-| description     | TEXT          |
-| cast            | JSON          |
-| posterGradient  | VARCHAR       |
-
----
-
-## Running the Application
-
-### Start backend
-
-```bash
-cd backend
+cp .env.example .env
+# .env already has: VITE_API_URL=http://localhost:8000/api
 npm run dev
 ```
 
-Runs at: `http://localhost:3001`
+Runs at `http://localhost:3000`
 
-### Start frontend
+## API Overview
 
-In a separate terminal:
+Base URL: `/api`
 
-```bash
-npm run dev
-```
-
-Runs at: `http://localhost:3000`
-
----
-
-## API Endpoints
-
-| Method | Path      | Description                           |
-|--------|-----------|---------------------------------------|
-| GET    | `/`       | API status check                      |
-| GET    | `/health` | Health check — returns `{ "ok": true }` |
-| GET    | `/movies` | Returns all movies ordered by ID      |
-
-### GET /movies — response shape
-
-```json
-[
-  {
-    "id": 1,
-    "title": "Inception",
-    "year": 2010,
-    "rating": 8.8,
-    "genres": ["Sci-Fi", "Thriller"],
-    "duration": "2h 28m",
-    "description": "...",
-    "cast": ["Leonardo DiCaprio", "..."],
-    "posterGradient": "linear-gradient(...)"
-  }
-]
-```
-
-> The frontend falls back to 12 hardcoded demo movies (`constants.ts`) if the backend is unavailable.
-
----
-
-## Notes
-
-- Authentication is **client-side only** — passwords are stored in `localStorage` as plaintext. For demonstration purposes only.
-- Watchlist and ratings are stored in `localStorage`, not the database.
-- CORS is configured to allow only `http://localhost:3000`.
-
----
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/auth/register` | — | Register |
+| POST | `/auth/login` | — | Login |
+| POST | `/auth/logout` | ✓ | Logout |
+| GET | `/movies` | — | List movies |
+| GET | `/movies/{id}/poster` | — | Movie poster image |
+| GET | `/watchlist` | ✓ | User's watchlist |
+| POST/DELETE | `/watchlist/{id}` | ✓ | Add/remove from watchlist |
+| GET | `/ratings` | ✓ | User's ratings |
+| POST | `/ratings/{id}` | ✓ | Rate a movie |
+| GET/POST/DELETE | `/notes/{id}` | ✓ | Personal notes |
+| GET/POST/PUT/DELETE | `/admin/movies` | admin | Manage movies |
+| GET | `/admin/stats` | admin | Statistics |
 
 ## License
 
-Educational / demonstration project.
+Educational project.

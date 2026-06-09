@@ -30,4 +30,8 @@ api.interceptors.response.use(
   },
 )
 
+export function posterUrl(movieId: number): string {
+  return `${API_URL}/movies/${movieId}/poster`
+}
+
 export default api

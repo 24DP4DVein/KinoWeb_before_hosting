@@ -7,8 +7,12 @@ export const useWatchlistStore = defineStore('watchlist', () => {
   const movieIds = ref<Set<number>>(new Set())
 
   async function fetch() {
-    const { data } = await api.get('/watchlist')
-    movieIds.value = new Set(data)
+    try {
+      const { data } = await api.get('/watchlist')
+      movieIds.value = new Set(data)
+    } catch {
+      // keep existing state on failure
+    }
   }
 
   async function toggle(movieId: number) {
@@ -16,11 +20,19 @@ export const useWatchlistStore = defineStore('watchlist', () => {
     if (!auth.isLoggedIn) return
 
     if (movieIds.value.has(movieId)) {
-      await api.delete(`/watchlist/${movieId}`)
       movieIds.value.delete(movieId)
+      try {
+        await api.delete(`/watchlist/${movieId}`)
+      } catch {
+        movieIds.value.add(movieId)
+      }
     } else {
-      await api.post(`/watchlist/${movieId}`)
       movieIds.value.add(movieId)
+      try {
+        await api.post(`/watchlist/${movieId}`)
+      } catch {
+        movieIds.value.delete(movieId)
+      }
     }
   }
 

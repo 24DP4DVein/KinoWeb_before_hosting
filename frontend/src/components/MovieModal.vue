@@ -9,7 +9,7 @@
         >
           <v-img
             v-if="movie.has_poster"
-            :src="`${apiUrl}/movies/${movie.id}/poster`"
+            :src="posterUrl(movie.id)"
             cover
             height="100%"
             width="220"
@@ -93,6 +93,15 @@
                 no-resize
                 class="mb-2"
               />
+              <v-alert
+                v-if="noteError"
+                type="error"
+                density="compact"
+                variant="tonal"
+                class="mb-2 text-caption"
+                closable
+                @click:close="noteError = null"
+              >{{ noteError }}</v-alert>
               <div class="d-flex justify-end ga-2">
                 <v-btn
                   v-if="noteText !== notesStore.get(movie.id)"
@@ -134,31 +143,31 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { Movie } from '@/types'
+import { posterUrl } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import { useWatchlistStore } from '@/stores/watchlist'
 import { useRatingsStore } from '@/stores/ratings'
 import { useNotesStore } from '@/stores/notes'
 
-const apiUrl = import.meta.env.VITE_API_URL as string || 'http://localhost:8000/api'
-
 const props = defineProps<{ modelValue: boolean; movie: Movie | null }>()
-const emit  = defineEmits<{ 'update:modelValue': [v: boolean] }>()
+const emit = defineEmits<{ 'update:modelValue': [v: boolean] }>()
 
 const isOpen = computed({
   get: () => props.modelValue,
   set: (v) => emit('update:modelValue', v),
 })
 
-const authStore      = useAuthStore()
+const authStore = useAuthStore()
 const watchlistStore = useWatchlistStore()
-const ratingsStore   = useRatingsStore()
-const notesStore     = useNotesStore()
+const ratingsStore = useRatingsStore()
+const notesStore = useNotesStore()
 
 const inWatchlist = computed(() => (props.movie ? watchlistStore.has(props.movie.id) : false))
-const userRating  = computed(() => (props.movie ? ratingsStore.get(props.movie.id) : null))
+const userRating = computed(() => (props.movie ? ratingsStore.get(props.movie.id) : null))
 
-const noteText   = ref('')
+const noteText = ref('')
 const savingNote = ref(false)
+const noteError = ref<string | null>(null)
 
 watch(
   () => props.movie?.id,
@@ -178,8 +187,11 @@ watch(
 async function saveNote() {
   if (!props.movie) return
   savingNote.value = true
+  noteError.value = null
   try {
     await notesStore.save(props.movie.id, noteText.value)
+  } catch {
+    noteError.value = 'Failed to save note. Please try again.'
   } finally {
     savingNote.value = false
   }
@@ -187,8 +199,13 @@ async function saveNote() {
 
 async function deleteNote() {
   if (!props.movie) return
-  await notesStore.remove(props.movie.id)
-  noteText.value = ''
+  noteError.value = null
+  try {
+    await notesStore.remove(props.movie.id)
+    noteText.value = ''
+  } catch {
+    noteError.value = 'Failed to delete note. Please try again.'
+  }
 }
 </script>
 
